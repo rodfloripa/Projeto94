@@ -44,6 +44,43 @@ pricing-api/
 * **`tests/test_api.py`**: Simula requisições HTTP reais na aplicação para garantir que os retornos e códigos de status HTTP correspondam às expectativas.
 * **`pyproject.toml`**: Centraliza as dependências do projeto e as regras rígidas de tipagem estática do `mypy` (`strict = true`).
 
+### 📥 O que a API Recebe (Request Body)
+A rota `POST /pedido/calcular` espera receber um JSON contendo os dados do pedido. A estrutura aceita uma lista de itens e regras opcionais de desconto ou cupom:
+
+```json
+{
+  "itens": [
+    {
+      "sku": "string",       // Código/SKU do produto (obrigatório)
+      "preco_base": 0.0,     // Preço unitário (obrigatório, float estrito, > 0)
+      "quantidade": 1        // Quantidade do item (obrigatório, inteiro, entre 1 e 50)
+    }
+  ],
+  "desconto_percent": 10.0,  // Opcional: Desconto em porcentagem (ex: 10 para 10%)
+  "cupom": "PROMO10"         // Opcional: Código de cupom de desconto
+}
+```
+* **Regra de ouro aplicada:** O Pydantic garante que se você enviar uma string onde deveria ser um número (ex: `"preco_base": "100"`), a API rejeita imediatamente com erro `422`. Além disso, a validação cruzada impede que você envie `desconto_percent` e `cupom` ao mesmo tempo.
+
+---
+
+### 📤 O que a API Devolve (Response Body)
+Quando a requisição é bem-sucedida (**HTTP 200 OK**), ela retorna um JSON estrito contendo os cálculos consolidados do pedido:
+
+```json
+{
+  "total_bruto": 200.0,      // Valor total dos itens antes de qualquer desconto
+  "total_liquido": 180.0,    // Valor final a pagar após a aplicação do desconto
+  "itens": [
+    {
+      "sku": "ABC123",       // SKU do produto processado
+      "total_item": 200.0    // Subtotal daquele item específico (preço_base × quantidade)
+    }
+  ]
+}
+```
+* **Garantia de segurança:** A saída é totalmente tipada e filtrada, garantindo que nenhum dado interno ou sensível da aplicação vaze para o cliente.
+
 ---
 
 ## Como rodar localmente
