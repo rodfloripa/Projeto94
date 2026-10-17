@@ -69,6 +69,7 @@ uvicorn app.main:app --reload
 curl -X POST http://localhost:8000/pedido/calcular \
   -H "Content-Type: application/json" \
   -d '{"itens": [{"sku": "ABC123", "preco_base": 100.0, "quantidade": 2}], "desconto_percent": 10}'
+{"total_bruto":200.0,"total_liquido":180.0,"itens":[{"sku":"ABC123","total_item":200.0}]}
 
 # Tentativa de injetar string no preço (Retorna 422)
 curl -X POST http://localhost:8000/pedido/calcular \
