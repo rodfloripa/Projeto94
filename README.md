@@ -1,4 +1,4 @@
-```markdown
+
 # Pricing API - Python com segurança de Java
 
 API de cálculo de pedidos feita pra provar que Python pode ser tão seguro quanto Java se usado do jeito certo.
