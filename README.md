@@ -72,6 +72,16 @@ curl -X POST http://localhost:8000/pedido/calcular \
 
 # Tentativa de injetar string no preço (Retorna 422)
 curl -X POST http://localhost:8000/pedido/calcular \
+
+# Cálculo bem-sucedido
+curl -X POST http://localhost:8000/pedido/calcular \
+  -H "Content-Type: application/json" \
+  -d '{"itens": [{"sku": "ABC123", "preco_base": 100.0, "quantidade": 2}], "desconto_percent": 10}'
+
+# Tentativa de injetar string no preço (Retorna 422)
+curl -X POST http://localhost:8000/pedido/calcular \
+  -H "Content-Type: application/json" \
+  -d '{"itens": [{"sku": "ABC", "preco_base": "100", "quantidade": 1}]}'
   -H "Content-Type: application/json" \
   -d '{"itens": [{"sku": "ABC", "preco_base": "100", "quantidade": 1}]}'
 ```
