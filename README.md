@@ -72,8 +72,10 @@ curl -X POST http://localhost:8000/pedido/calcular \
 {"total_bruto":200.0,"total_liquido":180.0,"itens":[{"sku":"ABC123","total_item":200.0}]}
 
 # Tentativa de injetar string no preço (Retorna 422)
-curl -X POST http://localhost:8000/pedido/calcular \
-{"detail":[{"type":"missing","loc":["body"],"msg":"Field required","input":null}]}
+ curl -X POST http://localhost:8000/pedido/calcular \
+  -H "Content-Type: application/json" \
+  -d '{"itens": [{"sku": "ABC", "preco_base": "100", "quantidade": 1}]}'
+{"detail":[{"type":"float_type","loc":["body","itens",0,"preco_base"],"msg":"Input should be a valid number","input":"100"}]}
 
 ```
 
