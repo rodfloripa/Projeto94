@@ -9,11 +9,85 @@
 <p align="justify">Todo tutorial de FastAPI básico permite conversões implícitas perigosas (como <code>"100"</code> + <code>"20"</code>). Este projeto aplica 6 regras de API segura:</p>
 
 * <p align="justify"><b>Toda entrada é BaseModel strict</b> - nada de <code>dict</code> solto.</p>
+  <p align="justify"><i>Localização: <code>app/models.py</code> (Linhas 12-23) e <code>app/main.py</code> (Linha 15)</i></p>
+
+```python
+# app/models.py (Linhas 12-23)
+class ItemPedido(BaseModel):
+    sku: str
+    preco_base: StrictFloat = Field(gt=0)
+    quantidade: StrictInt = Field(gt=0, le=50)
+
+class PedidoRequest(BaseModel):
+    itens: list[ItemPedido]
+    desconto_percent: StrictFloat | None = Field(default=None, ge=0, le=100)
+    cupom: str | None = None
+
+# app/main.py (Linha 15)
+@app.post("/pedido/calcular", response_model=PedidoResponse)
+def calcular_pedido_endpoint(payload: PedidoRequest) -> PedidoResponse: ...
+```
+
 * <p align="justify"><b>Dinheiro sempre <code>strict=True</code></b> - strings mascaradas como números geram erro imediato (<code>422</code>).</p>
+  <p align="justify"><i>Localização: <code>app/models.py</code> (Linha 14)</i></p>
+
+```python
+# app/models.py (Linha 14)
+class ItemPedido(BaseModel):
+    sku: str
+    preco_base: StrictFloat = Field(gt=0)  # Rejeita "100.0" (string) com erro 422
+```
+
 * <p align="justify"><b>Regra de negócio direto no Field</b> - validações de limite (<code>gt=0</code>, <code>le=50</code>).</p>
+  <p align="justify"><i>Localização: <code>app/models.py</code> (Linhas 14-15 e 20)</i></p>
+
+```python
+# app/models.py (Linhas 14-15, 20)
+preco_base: StrictFloat = Field(gt=0)
+quantidade: StrictInt = Field(gt=0, le=50)
+desconto_percent: StrictFloat | None = Field(default=None, ge=0, le=100)
+```
+
 * <p align="justify"><b>Validação cruzada com <code>model_validator</code></b> - cupom OU desconto, nunca os dois.</p>
+  <p align="justify"><i>Localização: <code>app/models.py</code> (Linhas 25-32)</i></p>
+
+```python
+# app/models.py (Linhas 25-32)
+@model_validator(mode="after")
+def valida_cupom_ou_desconto(self) -> "PedidoRequest":
+    if self.desconto_percent is not None and self.cupom is not None:
+        raise ValueError("Não é permitido aplicar desconto percentual e cupom simultaneamente.")
+    return self
+```
+
 * <p align="justify"><b><code>mypy strict</code> no CI</b> - impede reatribuição incorreta de tipos.</p>
+  <p align="justify"><i>Localização: <code>pyproject.toml</code> (Linhas 15-18)</i></p>
+
+```toml
+# pyproject.toml (Linhas 15-18)
+[tool.mypy]
+strict = true
+disallow_untyped_defs = true
+warn_return_any = true
+```
+
 * <p align="justify"><b>Saída tipada</b> - garante que nenhum dado sensível vaze.</p>
+  <p align="justify"><i>Localização: <code>app/models.py</code> (Linhas 35-43) e <code>app/main.py</code> (Linha 15)</i></p>
+
+```python
+# app/models.py (Linhas 35-43)
+class ItemResposta(BaseModel):
+    sku: str
+    total_item: float
+
+class PedidoResponse(BaseModel):
+    total_bruto: float
+    total_liquido: float
+    itens: list[ItemResposta]
+
+# app/main.py (Linha 15)
+@app.post("/pedido/calcular", response_model=PedidoResponse)
+```
 
 ---
 
