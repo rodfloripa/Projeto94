@@ -1,25 +1,25 @@
+---
 
-# Pricing API - Python com segurança de Java
+<p align="justify"><h1>Pricing API - Python com segurança de Java</h1></p>
 
-API de cálculo de pedidos feita pra provar que Python pode ser tão seguro quanto Java se usado do jeito certo.
+<p align="justify">API de cálculo de pedidos feita pra provar que Python pode ser tão seguro quanto Java se usado do jeito certo.</p>
 
-## Por que esse projeto existe?
+<p align="justify"><h2>Por que esse projeto existe?</h2></p>
 
-Todo tutorial de FastAPI básico permite conversões implícitas perigosas (como `"100"` + `"20"`). 
-Este projeto aplica 6 regras de API segura:
+<p align="justify">Todo tutorial de FastAPI básico permite conversões implícitas perigosas (como <code>"100"</code> + <code>"20"</code>). Este projeto aplica 6 regras de API segura:</p>
 
-1. **Toda entrada é BaseModel strict** - nada de `dict` solto.
-2. **Dinheiro sempre `strict=True`** - strings mascaradas como números geram erro imediato (`422`).
-3. **Regra de negócio direto no Field** - validações de limite (`gt=0`, `le=50`).
-4. **Validação cruzada com `model_validator`** - cupom OU desconto, nunca os dois.
-5. **`mypy strict` no CI** - impede reatribuição incorreta de tipos.
-6. **Saída tipada** - garante que nenhum dado sensível vaze.
+* <p align="justify"><b>Toda entrada é BaseModel strict</b> - nada de <code>dict</code> solto.</p>
+* <p align="justify"><b>Dinheiro sempre <code>strict=True</code></b> - strings mascaradas como números geram erro imediato (<code>422</code>).</p>
+* <p align="justify"><b>Regra de negócio direto no Field</b> - validações de limite (<code>gt=0</code>, <code>le=50</code>).</p>
+* <p align="justify"><b>Validação cruzada com <code>model_validator</code></b> - cupom OU desconto, nunca os dois.</p>
+* <p align="justify"><b><code>mypy strict</code> no CI</b> - impede reatribuição incorreta de tipos.</p>
+* <p align="justify"><b>Saída tipada</b> - garante que nenhum dado sensível vaze.</p>
 
 ---
 
-## 📁 Estrutura e Arquivos do Projeto
+<p align="justify"><h2>📁 Estrutura e Arquivos do Projeto</h2></p>
 
-Para manter o código limpo, testável e desacoplado, o projeto é dividido nos seguintes arquivos:
+<p align="justify">Para manter o código limpo, testável e desacoplado, o projeto é dividido nos seguintes arquivos:</p>
 
 ```text
 pricing-api/
@@ -36,16 +36,20 @@ pricing-api/
 └── pyproject.toml       # Gerenciamento de dependências, metadados e configuração do Mypy/Pytest
 ```
 
-### Detalhes de cada componente:
-* **`app/models.py`**: Define os contratos de entrada e saída usando `BaseModel` do Pydantic com `strict=True`. É aqui que garantimos que tipos errados (como strings em campos numéricos) sejam barrados na porta com um erro `422`, além de aplicar validações cruzadas (`model_validator`).
-* **`app/service.py`**: Contém o coração da regra de negócio (`calcula_pedido`). Como ele não importa o FastAPI, ele pode ser testado isoladamente ou reutilizado em jobs de processamento em lote (*batch*).
-* **`app/main.py`**: Configura a instância do FastAPI e expõe os endpoints HTTP (`/pedido/calcular` e `/health`), delegando o processamento pesado para a camada de serviço.
-* **`tests/test_models.py`**: Valida unitariamente se as restrições e exceções do Pydantic estão funcionando conforme esperado.
-* **`tests/test_api.py`**: Simula requisições HTTP reais na aplicação para garantir que os retornos e códigos de status HTTP correspondam às expectativas.
-* **`pyproject.toml`**: Centraliza as dependências do projeto e as regras rígidas de tipagem estática do `mypy` (`strict = true`).
+<p align="justify"><h3>Detalhes de cada componente:</h3></p>
 
-### 📥 O que a API Recebe (Request Body)
-A rota `POST /pedido/calcular` espera receber um JSON contendo os dados do pedido. A estrutura aceita uma lista de itens e regras opcionais de desconto ou cupom:
+* <p align="justify"><b><code>app/models.py</code></b>: Define os contratos de entrada e saída usando <code>BaseModel</code> do Pydantic com <code>strict=True</code>. É aqui que garantimos que tipos errados (como strings em campos numéricos) sejam barrados na porta com um erro <code>422</code>, além de aplicar validações cruzadas (<code>model_validator</code>).</p>
+* <p align="justify"><b><code>app/service.py</code></b>: Contém o coração da regra de negócio (<code>calcula_pedido</code>). Como ele não importa o FastAPI, ele pode ser testado isoladamente ou reutilizado em jobs de processamento em lote (<i>batch</i>).</p>
+* <p align="justify"><b><code>app/main.py</code></b>: Configura a instância do FastAPI e expõe os endpoints HTTP (<code>/pedido/calcular</code> e <code>/health</code>), delegando o processamento pesado para a camada de serviço.</p>
+* <p align="justify"><b><code>tests/test_models.py</code></b>: Valida unitariamente se as restrições e exceções do Pydantic estão funcionando conforme esperado.</p>
+* <p align="justify"><b><code>tests/test_api.py</code></b>: Simula requisições HTTP reais na aplicação para garantir que os retornos e códigos de status HTTP correspondam às expectativas.</p>
+* <p align="justify"><b><code>pyproject.toml</code></b>: Centraliza as dependências do projeto e as regras rígidas de tipagem estática do <code>mypy</code> (<code>strict = true</code>).</p>
+
+---
+
+<p align="justify"><h3>📥 O que a API Recebe (Request Body)</h3></p>
+
+<p align="justify">A rota <code>POST /pedido/calcular</code> espera receber um JSON contendo os dados do pedido. A estrutura aceita uma lista de itens e regras opcionais de desconto ou cupom:</p>
 
 ```json
 {
@@ -60,12 +64,14 @@ A rota `POST /pedido/calcular` espera receber um JSON contendo os dados do pedid
   "cupom": "PROMO10"         // Opcional: Código de cupom de desconto
 }
 ```
-* **Regra de ouro aplicada:** O Pydantic garante que se você enviar uma string onde deveria ser um número (ex: `"preco_base": "100"`), a API rejeita imediatamente com erro `422`. Além disso, a validação cruzada impede que você envie `desconto_percent` e `cupom` ao mesmo tempo.
+
+* <p align="justify"><b>Regra de ouro aplicada:</b> O Pydantic garante que se você enviar uma string onde deveria ser um número (ex: <code>"preco_base": "100"</code>), a API rejeita imediatamente com erro <code>422</code>. Além disso, a validação cruzada impede que você envie <code>desconto_percent</code> e <code>cupom</code> ao mesmo tempo.</p>
 
 ---
 
-### 📤 O que a API Devolve (Response Body)
-Quando a requisição é bem-sucedida (**HTTP 200 OK**), ela retorna um JSON estrito contendo os cálculos consolidados do pedido:
+<p align="justify"><h3>📤 O que a API Devolve (Response Body)</h3></p>
+
+<p align="justify">Quando a requisição é bem-sucedida (<b>HTTP 200 OK</b>), ela retorna um JSON estrito contendo os cálculos consolidados do pedido:</p>
 
 ```json
 {
@@ -79,11 +85,12 @@ Quando a requisição é bem-sucedida (**HTTP 200 OK**), ela retorna um JSON est
   ]
 }
 ```
-* **Garantia de segurança:** A saída é totalmente tipada e filtrada, garantindo que nenhum dado interno ou sensível da aplicação vaze para o cliente.
+
+* <p align="justify"><b>Garantia de segurança:</b> A saída é totalmente tipada e filtrada, garantindo que nenhum dado interno ou sensível da aplicação vaze para o cliente.</p>
 
 ---
 
-## Como rodar localmente
+<p align="justify"><h2>Como rodar localmente</h2></p>
 
 ```bash
 # Instalar dependências em modo editável com grupo de desenvolvimento
@@ -99,7 +106,9 @@ pytest -v
 uvicorn app.main:app --reload
 ```
 
-## Testando via cURL
+---
+
+<p align="justify"><h2>Testando via cURL</h2></p>
 
 ```bash
 # Cálculo bem-sucedido
@@ -109,11 +118,101 @@ curl -X POST http://localhost:8000/pedido/calcular \
 {"total_bruto":200.0,"total_liquido":180.0,"itens":[{"sku":"ABC123","total_item":200.0}]}
 
 # Tentativa de injetar string no preço (Retorna 422)
- curl -X POST http://localhost:8000/pedido/calcular \
+curl -X POST http://localhost:8000/pedido/calcular \
   -H "Content-Type: application/json" \
   -d '{"itens": [{"sku": "ABC", "preco_base": "100", "quantidade": 1}]}'
 {"detail":[{"type":"float_type","loc":["body","itens",0,"preco_base"],"msg":"Input should be a valid number","input":"100"}]}
-
 ```
 
+---
+
+<p align="justify"><h2>🚀 Deploy da Pricing API no AWS App Runner (Passo a Passo)</h2></p>
+
+<p align="justify">O <b>AWS App Runner</b> é a forma mais simples, rápida e moderna de rodar containers Docker em produção na AWS. Ele gerencia automaticamente o balanceamento de carga, os certificados HTTPS, a infraestrutura e o autoscaling.</p>
+
+<p align="justify"><h3>📋 Pré-requisitos</h3></p>
+
+* <p align="justify">Uma conta na <b>AWS</b>.</p>
+* <p align="justify"><b>Docker</b> e <b>AWS CLI</b> instalados e configurados na sua máquina local.</p>
+* <p align="justify">Repositório do projeto com o <code>Dockerfile</code> finalizado.</p>
+
+---
+
+<p align="justify"><h3>Passo 1: Subir a Imagem Docker para o Amazon ECR</h3></p>
+
+<p align="justify">O Amazon ECR (Elastic Container Registry) é o repositório privado onde guardaremos a imagem Docker da API.</p>
+
+<p align="justify">1. <b>Faça login no ECR via AWS CLI</b> (substitua <code>&lt;REGION&gt;</code> e <code>&lt;ACCOUNT_ID&gt;</code> pelos seus dados):</p>
+
+```bash
+aws ecr get-login-password --region <REGION> | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com
+```
+
+<p align="justify">2. <b>Crie o repositório no ECR:</b></p>
+
+```bash
+aws ecr create-repository --repository-name pricing-api
+```
+
+<p align="justify">3. <b>Gere a imagem da sua aplicação:</b></p>
+
+```bash
+docker build -t pricing-api .
+```
+
+<p align="justify">4. <b>Adicione a tag da imagem apontando para o ECR:</b></p>
+
+```bash
+docker tag pricing-api:latest <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/pricing-api:latest
+```
+
+<p align="justify">5. <b>Envie a imagem para a AWS:</b></p>
+
+```bash
+docker push <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/pricing-api:latest
+```
+
+---
+
+<p align="justify"><h3>⚙️ Passo 2: Configurar o AWS App Runner</h3></p>
+
+<p align="justify">1. Acesse o <b>Console da AWS</b> e navegue até o serviço <b>AWS App Runner</b>.</p>
+<p align="justify">2. Clique em <b>Create an App Runner service</b>.</p>
+<p align="justify">3. Na seção <b>Source</b>:</p>
+
+* <p align="justify">Escolha <b>Container registry</b>.</p>
+* <p align="justify">Em <b>Provider</b>, selecione <b>Amazon ECR</b>.</p>
+* <p align="justify">Em <b>Container image URI</b>, selecione o repositório <code>pricing-api</code> e a tag <code>latest</code>.</p>
+* <p align="justify">Em <b>Deployment trigger</b>, escolha <b>Automatic</b> (assim, sempre que você mandar uma imagem nova para o ECR, o App Runner atualiza a API sozinho).</p>
+
+<p align="justify">4. Clique em <b>Next</b>.</p>
+
+---
+
+<p align="justify"><h3>🔧 Passo 3: Configurar o Serviço de Aplicação</h3></p>
+
+<p align="justify">1. <b>Service name:</b> Informe <code>pricing-api-prod</code>.</p>
+<p align="justify">2. <b>Virtual CPU & Memory:</b> Escolha a menor configuração para começar (ex: <code>1 vCPU</code> e <code>2 GB</code>).</p>
+<p align="justify">3. <b>Port:</b> Defina como <code>8000</code> (a porta exposta pelo seu <code>Dockerfile</code>/Uvicorn).</p>
+<p align="justify">4. <b>Environment variables:</b> Adicione variáveis de produção se necessário (ex: <code>ENVIRONMENT=production</code>).</p>
+<p align="justify">5. Clique em <b>Next</b>, revise as configurações e clique em <b>Create & deploy</b>.</p>
+
+---
+
+<p align="justify"><h3>✅ Passo 4: Validação e Teste em Produção</h3></p>
+
+<p align="justify">Após alguns minutos, o App Runner finalizará a implantação e fornecerá uma URL pública segura (ex: <code>https://xyz123.us-east-1.awsapprunner.com</code>).</p>
+
+<p align="justify">Para validar a API em produção, execute o <code>cURL</code> apontando para a nova URL pública:</p>
+
+```bash
+curl -X POST https://<SUA-URL-APP-RUNNER>/pedido/calcular \
+  -H "Content-Type: application/json" \
+  -d '{"itens": [{"sku": "ABC123", "preco_base": 100.0, "quantidade": 2}], "desconto_percent": 10}'
+```
+
+<p align="justify"><b>Resposta esperada (HTTP 200):</b></p>
+
+```json
+{"total_bruto":200.0,"total_liquido":180.0,"itens":[{"sku":"ABC123","total_item":200.0}]}
 ```
